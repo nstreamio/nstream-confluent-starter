@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nstream Introspection</title>
+    <meta name="viewport" content="width=device-width, 
+height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0, 
+shrink-to-fit=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" 
+content="black-translucent">
+    <style>
+      html, body {
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+    <link rel="stylesheet" 
+href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css">
+    <script 
+src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  </head>
+  <body swim-theme style="display: flex;">
+    <script src="https://cdn.nstream.io/js/4.0.0/swim.min.js"></script>
+    <script 
+src="https://cdn.nstream.io/js/4.0.0/nstream-gui.min.js"></script>
+    <script 
+src="https://cdn.nstream.io/js/4.0.0/nstream-introspect.min.js"></script>
+    <script>
+
+if (navigator.standalone) {
+  document.documentElement.style.width = "100vw";
+  document.documentElement.style.height = "100vh";
+} else {
+  document.documentElement.style.width = "100%";
+  document.documentElement.style.height = "100%";
+}
+document.body.style.position = "fixed";
+if (navigator.standalone) {
+  document.body.style.width = "100vw";
+  document.body.style.height = "100vh";
+} else {
+  document.body.style.width = "100%";
+  document.body.style.height = "100%";
+}
+document.body.style.margin = "0";
+document.body.style.overflow = "hidden";
+
+mapboxgl.accessToken = 
+"pk.eyJ1Ijoic3dpbWl0IiwiYSI6ImNqY2c3NXZkYzFoa2QycXQ1eXl1Mnd6M3EifQ.qpRE7xC08AyZfxJ56LoN7w";
+
+const query = window.location.search;
+const urlParams = new URLSearchParams(query);
+let host = urlParams.get("host");
+const baseUri = swim.Uri.parse(document.location.href);
+if (!host) {
+  host = baseUri.base().withScheme(baseUri.schemeName === "https" ? 
+"warps" : "warp").toString();
+}
+let token = urlParams.get("token");
+if (token !== null) {
+  localStorage.setItem(`swim.authToken.${host}`, token);
+  history.replaceState(null, "", location.pathname + 
+location.search.replace(/[\?&]token=[^&]+/, "").replace(/^&/, "?"));
+} else {
+  token = localStorage.getItem(`swim.authToken.${host}`);
+}
+
+const appModel = new swim.Model();
+const appTrait = appModel.appendTrait(nstream.introspect.AppEntityTrait, 
+"entity");
+appTrait.hostUri.set(host);
+appTrait.nodeUri.set("swim:meta:mesh");
+appTrait.laneUri.set("nodes#/");
+appTrait.setAppHost(host);
+appModel.appendTrait(swim.SelectableTrait, "selectable");
+//appModel.mount();
+
+appTrait.portal.insertModel();
+appTrait.agentsRelation.insertModel();
+
+const folioController = new nstream.EntityFolioController();
+folioController.hostUri.set(host);
+
+folioController.folio.attachView().style.set({
+  flexGrow: 1,
+});
+
+folioController.appBar.insertController();
+folioController.navBar.insertController();
+
+folioController.rootEntity.setTrait(appTrait);
+
+if (host !== null) {
+  const hostUri = swim.Uri.parse(host);
+  appTrait.title.set(hostUri.host.toString());
+
+  if (token !== null) {
+    const authValue = swim.Record.create(1).slot("idToken", token);
+    appModel.authenticate(host, authValue);
+
+    appModel.warpRef().hostDidAuthenticate = (body, host) => {
+      console.log("authenticated");
+      appModel.mount();
+      
+folioController.folio.insertView(swim.HtmlView.fromNode(document.body));
+      folioController.mount();
+    }
+
+    appModel.warpRef().hostDidDeauthenticate = (body, host) => {
+      console.log("deauthenticated from", host.key, "because", 
+body.toLike());
+      
+folioController.folio.insertView(swim.HtmlView.fromNode(document.body));
+      folioController.mount();
+      appModel.unmount();
+    }
+  } else {
+    appModel.mount();
+    
+folioController.folio.insertView(swim.HtmlView.fromNode(document.body));
+    folioController.mount();
+  }
+} else {
+  folioController.folio.insertView(swim.HtmlView.fromNode(document.body));
+  folioController.mount();
+}
+
+    </script>
+  </body>
+</html>

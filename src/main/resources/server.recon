@@ -1,0 +1,57 @@
+@kernel(class: 'swim.meta.MetaKernel', optional: true)
+
+provisions: {
+  @provision("consumer-properties") {
+    class: "nstream.adapter.common.provision.PropertiesProvision",
+    config: "consumer.properties" # Compare to schema/server.recon
+  }
+}
+
+"starter": @fabric {
+  @plane(class: "nstream.adapter.runtime.AppPlane")
+  # ingestion
+  @node {
+    uri: "/kafka"
+    @agent(class: "nstream.starter.VehiclesIngestingAgent") {
+      confluentIngressConf: @kafkaIngressSettings {
+        consumerPropertiesProvisionName: "consumer-properties"
+        topics: {"json-topic"} # Compare to schema/server.recon
+        valueContentTypeOverride: "json" # Compare to schema/server.recon
+        pollTimeoutMillis: 1000
+        relaySchema: @command {
+          nodeUri: {
+            "/vehicle/",
+            $key # $value$id will also work here
+          },
+          laneUri: "addEvent"
+          value: $value
+        }
+      }
+    }
+  }
+  # business logic
+  @node {
+    pattern: "/vehicle/:id"
+    @agent(class: "nstream.starter.VehicleAgent")
+    @agent(class: "nstream.starter.PolarityMemberAgent") {
+      "groupUriPattern": "/lat34/:group"
+    }
+  }
+  @node {
+    uri: "/lat34/north"
+    @agent(class: "nstream.adapter.common.patches.GroupPatch")
+  }
+  @node {
+    uri: "/lat34/south"
+    @agent(class: "nstream.adapter.common.patches.GroupPatch")
+  }
+}
+
+@web(port: 9001) {
+  space: "starter"
+  documentRoot: "./"
+  @websocket {
+    serverCompressionLevel: 0# -1 = default; 0 = off; 1-9 = deflate level
+    clientCompressionLevel: 0# -1 = default; 0 = off; 1-9 = deflate level
+  }
+}
