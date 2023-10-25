@@ -89,6 +89,8 @@ Working with this requires a few additional changes.
    - An API key corresponding to the Schema Registry
    - An API secret corresponding to the API key
 
+### Modified Run Instructions
+
 0. Fix different configuration files
    - Rename [`schema/consumer-fixme.properties`](/src/main/resources/schema/consumer-fixme.properties) to `consumer.properties` and fix any FIXMEs
    - Rename [`schema/producer-fixme.properties`](/src/main/resources/schema/producer-fixme.properties) to `producer.properties` and fix any FIXMEs
