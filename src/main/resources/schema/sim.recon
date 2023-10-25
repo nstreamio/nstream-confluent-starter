@@ -1,0 +1,23 @@
+provisions: {
+  @provision("vehicles-confluent-producer") {
+    class: "nstream.adapter.kafka.KafkaProducerProvision"
+    config: "schema/producer.properties"
+  }
+}
+
+"sim": @fabric {
+  @plane(class: "nstream.adapter.runtime.AppPlane")
+  @node {
+    pattern: "/vehicle/:id"
+    @agent(class: "nstream.starter.sim.VehicleSimAgent")
+    @agent(class: "nstream.starter.sim.SchemaVehiclePublishingAgent")
+  }
+}
+
+@web(port: 9002) {
+  space: "sim"
+  @websocket {
+    serverCompressionLevel: 0
+    clientCompressionLevel: 0
+  }
+}

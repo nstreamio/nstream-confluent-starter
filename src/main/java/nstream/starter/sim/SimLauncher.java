@@ -19,8 +19,8 @@ public final class SimLauncher {
   }
 
   public static void main(String[] args) {
-    System.setProperty("swim.config", "sim.recon");
     ProvisionLoader.loadProvisions(simKernelConfig());
+    ProvisionLoader.debugProvisionNames();
     final Kernel kernel = ServerLoader.loadServer();
     final Space space = kernel.getSpace("sim");
 
@@ -42,7 +42,6 @@ public final class SimLauncher {
       if (kernelConfig == null) {
         kernelConfig = Value.absent();
       }
-      System.out.println(kernelConfig);
       return kernelConfig;
     } catch (IOException e) {
       throw new RuntimeException("Failed to load kernel config", e);

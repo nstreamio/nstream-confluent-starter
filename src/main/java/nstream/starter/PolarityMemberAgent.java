@@ -6,10 +6,9 @@ import swim.structure.Value;
 import swim.uri.Uri;
 
 /**
- * A "low-code" {@link MemberPatch} extension with (in a fresh clone of this
- * repository) a corresponding "no-code" {@link
- * nstream.adapter.common.patches.GroupPatch GroupPatch} described in {@code
- * server.recon}.
+ * A "low-code" {@link MemberPatch} extension with a corresponding "no-code"
+ * {@link nstream.adapter.common.patches.GroupPatch GroupPatch} described in
+ * {@code server.recon}.
  * <p>Note how this trait is added to {@link VehicleAgent} instances in a
  * "mixin"-style fashion within {@code server.recon}.
  */

@@ -12,12 +12,14 @@ provisions: {
   # ingestion
   @node {
     uri: "/kafka"
-    @agent(class: "nstream.starter.VehiclesIngestingAgent") {
+    # Change to nstream.starter.SchemaVehiclesIngestingAgent for low-code,
+    #   backoff implementation
+    @agent(class: "nstream.adapter.confluent.ConfluentIngestingPatch") {
       confluentIngressConf: @kafkaIngressSettings {
         consumerPropertiesProvisionName: "consumer-properties"
         topics: {"json-topic"} # Compare to schema/server.recon
         valueContentTypeOverride: "json" # Compare to schema/server.recon
-        pollTimeoutMillis: 1000
+        pollTimeoutMillis: 1000 # If something isn't working, raising this value may help
         relaySchema: @command {
           nodeUri: {
             "/vehicle/",

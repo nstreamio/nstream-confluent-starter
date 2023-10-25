@@ -1,9 +1,18 @@
 package nstream.starter.sim;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 import swim.api.space.Space;
 import swim.structure.Record;
 import swim.structure.Value;
@@ -19,14 +28,14 @@ public final class VehiclesSimulation {
 
   public static void seed(Space space) {
     // routes
-    Utils.loadResourceLines("routes.csv", s -> {
+    loadResourceLines("routes.csv", s -> {
       final String[] split = s.split(",");
       if (split.length > 1) {
         ROUTES.put(Integer.parseInt(split[0]), split[1]);
       }
     });
     // locations
-    Utils.loadResourceLines("locations.csv", s -> {
+    loadResourceLines("locations.csv", s -> {
       final String[] split = s.split(",");
       if (split.length > 1) {
         final int vehicle = Integer.parseInt(split[0]);
@@ -66,6 +75,10 @@ public final class VehiclesSimulation {
         .slot("timestamp", timestamp);
   }
 
+  public static GenericRecord avroLocation(Value state) {
+    return Location.structureToGenericRecord(state);
+  }
+
   private static class Location {
 
     private final int vehicle;
@@ -90,6 +103,53 @@ public final class VehiclesSimulation {
       N, NE, E, SE, S, SW, W, NW
     }
 
+    private static GenericRecord structureToGenericRecord(Value structure) {
+      final GenericRecord result = new GenericData.Record(SCHEMA);
+      result.put("id", structure.get("id").intValue());
+      result.put("routeId", structure.get("routeId").intValue());
+      result.put("dir", new GenericData.EnumSymbol(DIR_SCHEMA, structure.get("dir").stringValue()));
+      result.put("latitude", structure.get("latitude").floatValue());
+      result.put("longitude", structure.get("longitude").floatValue());
+      result.put("speed", structure.get("speed").intValue());
+      result.put("bearing", new GenericData.EnumSymbol(BEARING_SCHEMA, structure.get("bearing").stringValue()));
+      result.put("routeName", structure.get("routeName").stringValue());
+      result.put("timestamp", structure.get("timestamp").longValue());
+      return result;
+    }
+
+    private static final Schema SCHEMA = SchemaBuilder.record("vehicle").fields()
+        .name("id").type().intType().noDefault()
+        .name("routeId").type().intType().noDefault()
+        .name("dir").type().enumeration("Dir")
+            .symbols("inbound", "outbound").noDefault()
+        .name("latitude").type().floatType().noDefault()
+        .name("longitude").type().floatType().noDefault()
+        .name("speed").type().intType().noDefault()
+        .name("bearing").type().enumeration("Bearing")
+            .symbols(Arrays.stream(Bearing.values()).map(Bearing::name).toArray(String[]::new))
+            .noDefault()
+        .name("routeName").type().stringType().noDefault()
+        .name("timestamp").type().longType().noDefault()
+        .endRecord();
+
+    private static final Schema DIR_SCHEMA = SCHEMA.getField("dir").schema();
+
+    private static final Schema BEARING_SCHEMA = SCHEMA.getField("bearing").schema();
+
+  }
+
+  public static InputStream loadResource(String resourceName) {
+    return VehiclesSimulation.class.getClassLoader()
+        .getResourceAsStream(resourceName);
+  }
+
+  public static void loadResourceLines(String resourceName, Consumer<String> onLine) {
+    try (InputStream is = loadResource(resourceName);
+         BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+      br.lines().forEach(onLine);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load lines from resource " + resourceName, e);
+    }
   }
 
 }

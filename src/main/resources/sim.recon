@@ -10,7 +10,7 @@ provisions: {
   @node {
     pattern: "/vehicle/:id"
     @agent(class: "nstream.starter.sim.VehicleSimAgent")
-    @agent(class: "nstream.starter.sim.VehicleJsonPublishingAgent")
+    @agent(class: "nstream.starter.sim.VehiclePublishingAgent")
   }
 }
 

@@ -1,6 +1,7 @@
 package nstream.starter;
 
 import nstream.adapter.confluent.ConfluentIngestingPatch;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 /**
@@ -15,7 +16,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
  * <p>A fresh clone of this repository uses the "no-code" variation; thus, this
  * class is unused until {@code server.recon} is modified to point to it.
  */
-public class VehiclesIngestingAgent extends ConfluentIngestingPatch<Integer, String> {
+public class SchemaVehiclesIngestingAgent extends ConfluentIngestingPatch<Integer, GenericRecord> {
 
   @Override
   protected void stageReception() {
@@ -29,7 +30,7 @@ public class VehiclesIngestingAgent extends ConfluentIngestingPatch<Integer, Str
         this::ingestBatch);
   }
 
-  private long nextBackoff(ConsumerRecords<Integer, String> records, long oldBackoff) {
+  private long nextBackoff(ConsumerRecords<Integer, GenericRecord> records, long oldBackoff) {
     if (!records.isEmpty()) {
       return 0L;
     } else if (oldBackoff < 0) {

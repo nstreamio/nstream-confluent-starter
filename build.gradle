@@ -20,8 +20,11 @@ dependencies {
 
   implementation group: 'io.nstream', name: 'nstream-adapter-runtime', version: "$NSTREAM_VERSION"
   implementation group: 'io.nstream', name: 'nstream-adapter-common', version: "$NSTREAM_VERSION"
-  implementation group: 'io.nstream', name: 'nstream-adapter-confluent', 
-version: "$NSTREAM_VERSION"
+  implementation group: 'io.nstream', name: 'nstream-adapter-confluent', version: "$NSTREAM_VERSION"
+
+  // Only required by the "schema" variation
+  implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.4.0'
+  implementation group: 'io.nstream', name: 'nstream-adapter-avro', version: "$NSTREAM_VERSION"
 
   // Use TestNG framework, also requires calling test.useTestNG() below
   testImplementation 'org.testng:testng:7.4.0'
@@ -36,33 +39,24 @@ task runSim(type: JavaExec) {
   group = 'application'
   classpath sourceSets.main.runtimeClasspath
   mainClass = 'nstream.starter.sim.SimLauncher'
+  setSystemProperties(Map.of("swim.config", "sim.recon"))
 }
 
-compileJava {
-  // Hacky workaround to Gradle's inability to infer automatic unnamed modules
-  modularity.inferModulePath = false
-  doFirst {
-    options.compilerArgs += ['--module-path', classpath.asPath]
-  }
+task runSchema(type: JavaExec) {
+  group = 'application'
+  classpath sourceSets.main.runtimeClasspath
+  mainClass = 'nstream.adapter.runtime.AppPlane'
+  setSystemProperties(Map.of("swim.config", "schema/server.recon"))
+}
+
+task runSchemaSim(type: JavaExec) {
+  group = 'application'
+  classpath sourceSets.main.runtimeClasspath
+  mainClass = 'nstream.starter.sim.SimLauncher'
+  setSystemProperties(Map.of("swim.config", "schema/sim.recon"))
 }
 
 tasks.named('test') {
   // Use TestNG for unit tests.
   useTestNG()
-}
-
-task copyDockerResources(type: Copy) {
-  from tasks.jar.outputs
-  from configurations.runtimeClasspath
-  into "${buildDir}/docker/libs"
-}
-
-task copyDockerfile(type: Copy) {
-  from 'docker/Dockerfile'
-  into "${buildDir}/docker"
-}
-
-task dockerBuildImage() {
-  dependsOn copyDockerResources
-  dependsOn copyDockerfile
 }
