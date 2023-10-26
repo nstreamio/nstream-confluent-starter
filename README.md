@@ -2,7 +2,7 @@
 
 A baseline Nstream application that processes data hosted in Confluent Cloud.
 
-We highly recommend following our [Kafka starter walkthrough](https://www.nstream.io/docs/backend/confluent-vehicle-tutorial/) as you explore this codebase.
+We highly recommend following our [Confluent starter walkthrough](https://www.nstream.io/docs/backend/confluent-vehicle-tutorial/) as you explore this codebase.
 
 ## Component Overview
 
