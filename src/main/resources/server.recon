@@ -19,7 +19,8 @@ provisions: {
         consumerPropertiesProvisionName: "consumer-properties"
         topics: {"json-topic"} # Compare to schema/server.recon
         valueContentTypeOverride: "json" # Compare to schema/server.recon
-        pollTimeoutMillis: 1000 # If something isn't working, raising this value may help
+        # If you get the no-assignment warning or silence, try raising this value
+        pollTimeoutMillis: 1000
         relaySchema: @command {
           nodeUri: {
             "/vehicle/",

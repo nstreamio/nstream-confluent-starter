@@ -1,15 +1,15 @@
 package nstream.starter.sim;
 
+import nstream.adapter.confluent.ConfluentPublishingAgent;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import nstream.adapter.common.provision.ProvisionLoader;
-import nstream.adapter.kafka.KafkaPublishingAgent;
 import swim.api.SwimLane;
 import swim.api.lane.ValueLane;
 import swim.json.Json;
 import swim.structure.Value;
 
-public class VehiclePublishingAgent extends KafkaPublishingAgent<Value, Integer, String> {
+public class VehiclePublishingAgent extends ConfluentPublishingAgent<Value, Integer, String> {
 
   @SwimLane("toPublish")
   ValueLane<Value> toPublish = this.<Value>valueLane()
