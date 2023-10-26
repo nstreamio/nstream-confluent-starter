@@ -14,7 +14,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
  * {@code server.recon} operate -- after all, ingesting agents are still web
  * agents.
  * <p>A fresh clone of this repository uses the "no-code" variation; thus, this
- * class is unused until {@code server.recon} is modified to point to it.
+ * class is unused until {@code schema/server.recon} is modified to point to it.
  */
 public class SchemaVehiclesIngestingAgent extends ConfluentIngestingPatch<Integer, GenericRecord> {
 
