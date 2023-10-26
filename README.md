@@ -2,8 +2,7 @@
 
 A baseline Nstream application that processes data hosted in Confluent Cloud.
 
-We highly recommend following our [Kafka starter walkthrough](https://www.nstream.io/docs/backend/tutorial/) as you explore this codebase.
-Although the walkthrough uses plain Kafka, the only difference is that we use a [`ConfluentIngestingPatch`](https://www.nstream.io/docs/backend/confluent-ingress/) instead of `KafkaIngestingPatch`.
+We highly recommend following our [Kafka starter walkthrough](https://www.nstream.io/docs/backend/confluent-vehicle-tutorial/) as you explore this codebase.
 
 ## Component Overview
 
