@@ -25,8 +25,8 @@ There is also a minimal, general-purpose frontend component under [`index.html`]
 ## Run Instructions
 
 0. Fix the configuration files
-   - Rename [`consumer-fixme.properties`](/src/main/resources/consumer-fixme.properties) to `consumer.properties` and fix any FIXMEs
-   - Rename [`producer-fixme.properties`](/src/main/resources/producer-fixme.properties) to `producer.properties` and fix any FIXMEs
+   - Correctly populate [`secret.properties`](/src/main/resources/secret.properties)
+   - If necessary, make other changes directly to the other `.properties` files `src/main/resources`
 
 1. Run the Nstream server
 
@@ -91,8 +91,8 @@ Working with this requires a few additional changes.
 ### Modified Run Instructions
 
 0. Fix different configuration files
-   - Rename [`schema/consumer-fixme.properties`](/src/main/resources/schema/consumer-fixme.properties) to `consumer.properties` and fix any FIXMEs
-   - Rename [`schema/producer-fixme.properties`](/src/main/resources/schema/producer-fixme.properties) to `producer.properties` and fix any FIXMEs
+   - Correctly populate [`schema/secret.properties`](/src/main/resources/schema/consumer-fixme.properties)
+   - If necessary, make other changes directly to the other `.properties` files `src/main/resources/schema`
 1. Run the Nstream server with different arguments
 
    **\*nix Environment:**

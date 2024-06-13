@@ -3,7 +3,28 @@
 provisions: {
   @provision("consumer-properties") {
     class: "nstream.adapter.common.provision.PropertiesProvision",
-    config: "schema/consumer.properties" # Compare to json/server.recon
+    use: "consumer.properties"
+    def: {
+      "bootstrap.servers": @config {
+        env: "KAFKA_BOOTSTRAP_SERVERS"
+      },
+      "group.id": @config {
+        env: "KAFKA_GROUP_ID"
+        def: "bespoke-group"
+      },
+      "ccloud.api.key": @config {
+        env: "CCLOUD_API_KEY"
+      }
+      "ccloud.api.secret": @config {
+        env: "CCLOUD_API_SECRET"
+      }
+      "ccloud.schema.registry.key": @config {
+        env: "CCLOUD_SCHEMA_REGISTRY_KEY"
+      }
+      "ccloud.schema.registry.secret": @config {
+        env: "CCLOUD_SCHEMA_REGISTRY_SECRET"
+      }
+    }
   }
 }
 
@@ -22,10 +43,7 @@ provisions: {
         # If you get the no-assignment warning or silence, try raising this value
         pollTimeoutMillis: 1000
         relaySchema: @command {
-          nodeUri: {
-            "/vehicle/",
-            $key # $value$id will also work here
-          },
+          nodeUri: "/vehicle/$key" # $value$id will also work in place of $key
           laneUri: "addEvent"
           value: $value
         }

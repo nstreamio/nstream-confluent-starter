@@ -3,7 +3,22 @@
 provisions: {
   @provision("consumer-properties") {
     class: "nstream.adapter.common.provision.PropertiesProvision",
-    config: "consumer.properties" # Compare to schema/server.recon
+    use: {"consumer.properties", "secret.properties"}
+    def: {
+      "bootstrap.servers": @config {
+        env: "KAFKA_BOOTSTRAP_SERVERS"
+      },
+      "group.id": @config {
+        env: "KAFKA_GROUP_ID"
+        def: "bespoke-group"
+      },
+      "ccloud.api.key": @config {
+        env: "CCLOUD_API_KEY"
+      }
+      "ccloud.api.secret": @config {
+        env: "CCLOUD_API_SECRET"
+      }
+    }
   }
 }
 
@@ -17,15 +32,12 @@ provisions: {
     @agent(class: "nstream.adapter.confluent.ConfluentIngestingPatch") {
       confluentIngressConf: @kafkaIngressSettings {
         consumerPropertiesProvisionName: "consumer-properties"
-        topics: {"json-topic"} # Compare to schema/server.recon
+        topics: {"json-topic"}
         valueContentTypeOverride: "json" # Compare to schema/server.recon
         # If you get the no-assignment warning or silence, try raising this value
         pollTimeoutMillis: 1000
         relaySchema: @command {
-          nodeUri: {
-            "/vehicle/",
-            $key # $value$id will also work here
-          },
+          nodeUri: "/vehicle/$key" # $value$id will also work in place of $key
           laneUri: "addEvent"
           value: $value
         }

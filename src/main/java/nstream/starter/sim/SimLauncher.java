@@ -2,6 +2,7 @@ package nstream.starter.sim;
 
 import java.io.IOException;
 import nstream.adapter.common.provision.ProvisionLoader;
+import nstream.adapter.common.relay.LabeledLog;
 import swim.api.space.Space;
 import swim.kernel.Kernel;
 import swim.kernel.KernelLoader;
@@ -19,7 +20,7 @@ public final class SimLauncher {
   }
 
   public static void main(String[] args) {
-    ProvisionLoader.loadProvisions(simKernelConfig());
+    ProvisionLoader.loadProvisions(LabeledLog.forUniform("SimLauncher#main", System.out::println), simKernelConfig());
     ProvisionLoader.debugProvisionNames();
     final Kernel kernel = ServerLoader.loadServer();
     final Space space = kernel.getSpace("sim");
