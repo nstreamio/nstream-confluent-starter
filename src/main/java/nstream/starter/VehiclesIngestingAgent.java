@@ -21,7 +21,7 @@ public class VehiclesIngestingAgent extends ConfluentIngestingPatch<Integer, Str
   protected void stageReception() {
     prepareConsumer();
     this.pollTimer = scheduleWithInformedBackoff(this::pollTimer,
-        this.ingressSettings.firstFetchDelayMillis(),
+        100L,
         this::nextBackoff,
         i -> !i.isEmpty(),
         500L,

@@ -10,27 +10,31 @@ import swim.api.lane.ValueLane;
 import swim.structure.Value;
 
 public class SchemaVehiclePublishingAgent
-    extends ConfluentPublishingAgent<Value, Integer, GenericRecord> {
+    extends ConfluentPublishingAgent<Integer, GenericRecord> {
 
   @SwimLane("toPublish")
   ValueLane<Value> toPublish = this.<Value>valueLane()
       .didSet((n, o) -> {
         if (n != null && n.isDistinct() && !n.equals(o)) {
-          final ProducerRecord<Integer, GenericRecord> result = createPublishable(n);
-          publishAsync(result);
+          final ProducerRecord<Integer, GenericRecord> result = assemblePublishable(n);
+          execute(() -> publish(result));
         }
       });
 
   @Override
-  protected ProducerRecord<Integer, GenericRecord> createPublishable(Value state) {
+  protected void publish(Value structure) {
+    final ProducerRecord<Integer, GenericRecord> publishable = assemblePublishable(structure);
+    publish(publishable);
+  }
+
+  protected ProducerRecord<Integer, GenericRecord> assemblePublishable(Value state) {
     return new ProducerRecord<>("vehicle-schema",
         getProp("id").intValue(),
         VehiclesSimulation.avroLocation(state));
   }
 
   @Override
-  public void didStart() {
-    super.didStart();
+  protected void stagePublication() {
     assignProducer(ProvisionLoader.<Producer<Integer, GenericRecord>>
         getProvision("vehicles-confluent-producer").value());
   }

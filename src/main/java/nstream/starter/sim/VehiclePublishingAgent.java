@@ -9,27 +9,30 @@ import swim.api.lane.ValueLane;
 import swim.json.Json;
 import swim.structure.Value;
 
-public class VehiclePublishingAgent extends ConfluentPublishingAgent<Value, Integer, String> {
+public class VehiclePublishingAgent extends ConfluentPublishingAgent<Integer, String> {
 
   @SwimLane("toPublish")
   ValueLane<Value> toPublish = this.<Value>valueLane()
       .didSet((n, o) -> {
         if (n != null && n.isDistinct() && !n.equals(o)) {
-          final ProducerRecord<Integer, String> result = createPublishable(n);
-          publishAsync(result);
+          final ProducerRecord<Integer, String> result = assemblePublishable(n);
+          execute(() -> publish(result));
         }
       });
 
-  @Override
-  protected ProducerRecord<Integer, String> createPublishable(Value state) {
+  protected void publish(Value structure) {
+    ProducerRecord<Integer, String> publishable = assemblePublishable(structure);
+    this.publish(publishable);
+  }
+
+  protected ProducerRecord<Integer, String> assemblePublishable(Value state) {
     return new ProducerRecord<>("json-topic",
         getProp("id").intValue(),
         Json.toString(state));
   }
 
   @Override
-  public void didStart() {
-    super.didStart();
+  protected void stagePublication() {
     assignProducer(ProvisionLoader.<Producer<Integer, String>>
         getProvision("vehicles-confluent-producer").value());
   }
