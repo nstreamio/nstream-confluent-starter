@@ -91,7 +91,7 @@ Working with this requires a few additional changes.
 ### Modified Run Instructions
 
 0. Fix different configuration files
-   - Correctly populate [`schema/secret.properties`](/src/main/resources/schema/consumer-fixme.properties)
+   - Correctly populate [`schema/secret.properties`](/src/main/resources/schema/secret.properties)
    - If necessary, make other changes directly to the other `.properties` files `src/main/resources/schema`
 1. Run the Nstream server with different arguments
 
