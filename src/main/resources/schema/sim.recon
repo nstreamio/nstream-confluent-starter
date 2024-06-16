@@ -1,7 +1,7 @@
 provisions: {
   @provision("vehicles-confluent-producer") {
     class: "nstream.adapter.kafka.KafkaProducerProvision"
-    config: "schema/producer.properties"
+    use: {"schema/producer.properties", "schema/secret.properties"}
   }
 }
 

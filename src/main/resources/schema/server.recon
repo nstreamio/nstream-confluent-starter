@@ -3,7 +3,7 @@
 provisions: {
   @provision("consumer-properties") {
     class: "nstream.adapter.common.provision.PropertiesProvision",
-    use: "consumer.properties"
+    use: {"consumer.properties", "secret.properties"}
     def: {
       "bootstrap.servers": @config {
         env: "KAFKA_BOOTSTRAP_SERVERS"
